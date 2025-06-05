@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Todo SaaS</title>
+</head>
+<body>
+<h1>Todo SaaS</h1>
+<form id="task-form">
+    <input type="text" id="title" placeholder="Title" required>
+    <input type="text" id="description" placeholder="Description">
+    <button type="submit">Add Task</button>
+</form>
+<ul id="tasks"></ul>
+<script>
+async function fetchTasks() {
+    const res = await fetch('/api/tasks/');
+    const tasks = await res.json();
+    const list = document.getElementById('tasks');
+    list.innerHTML = '';
+    tasks.forEach(t => {
+        const li = document.createElement('li');
+        li.textContent = `${t.title} - ${t.description || ''}`;
+        list.appendChild(li);
+    });
+}
+
+document.getElementById('task-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = document.getElementById('title').value;
+    const description = document.getElementById('description').value;
+    await fetch('/api/tasks/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description })
+    });
+    document.getElementById('title').value = '';
+    document.getElementById('description').value = '';
+    fetchTasks();
+});
+
+fetchTasks();
+</script>
+</body>
+</html>
